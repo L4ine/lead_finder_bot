@@ -1,0 +1,36 @@
+{% extends "sqladmin/layout.html" %}
+{% block content %}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Userbot</h3>
+        </div>
+        <div class="card-body border-bottom py-3">
+            <form action="/copy-post/upload/" method="POST" enctype="multipart/form-data">
+                <fieldset class="form-fieldset">
+                    <div class="mb-3 form-group row">
+                        <label for="file" class="col-sm-2 col-form-label">Session File</label>
+                        <div class="col-sm-10">
+                            <input type="file" class="form-control" id="file" name="file">
+                            <small class="form-text text-muted" style="margin-top: 0.5rem;">
+                                В случае неработоспособности юзербота, вы можете обновить файл сессии здесь.
+                            </small>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="row">
+                    <div class="col-md-2">
+                        <a href="/copy-post/userbot" class="btn">Cancel</a>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="btn-group flex-wrap" data-toggle="buttons">
+                            <input type="submit" name="save" value="Save" class="btn">
+                            <input type="submit" name="test" value="Test" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
