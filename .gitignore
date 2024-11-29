@@ -4,6 +4,7 @@ __pycache__/
 
 .env
 *.log
+*.session
 
 .DS_Store
 
