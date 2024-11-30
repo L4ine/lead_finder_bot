@@ -4,12 +4,15 @@ import logging
 from asyncio import sleep
 
 from telethon import TelegramClient
-from telethon.types import Message
+from telethon.types import Message, Channel, Chat
 
 from db.db_api import get_setting, get_sources, \
 	record_exists, add_record
 
-from modules.gs_api import check_words_matches
+from modules.gs_api import check_words_matches, \
+	check_stop_words_matches
+from modules.utils import resolve_source
+
 from data.config import TG_API_ID, TG_API_HASH
 
 
@@ -31,23 +34,42 @@ async def parse_source(source: str) -> None:
 	if not target_channel_setting:
 		return
 
-	target_entity = await client.get_entity(target_channel_setting.value)
+	target_entity = await client.get_entity(
+		resolve_source(target_channel_setting.value)
+	)
 
 	try:
-		source_entity = await client.get_entity(source)
+		source_entity = await client.get_entity(resolve_source(source))
 
 		messages: list[Message] = await client.get_messages(source_entity, limit=10)
-
 		for post in messages:
 			try:
 				if await record_exists(source, post.id):
 					continue
 
+				if not post.message:
+					continue
+
+				if await check_stop_words_matches(post.message):
+					continue
+
 				if not await check_words_matches(post.message):
 					continue
 
-				await client.forward_messages(
-					target_entity, post.id, source_entity
+				author_entity = await client.get_entity(post.from_id)
+
+				if not author_entity.username:
+					continue
+
+				if isinstance(source_entity, Chat):
+					source_caption = source_entity.title
+				else:
+					source_caption = f'<a href="https://t.me/{source_entity.username}">{source_entity.title}</a>'
+
+				await client.send_message(
+					target_entity,
+					f'Источник: {source_caption}\nПользователь: @{author_entity.username}\nТелефон: +{author_entity.phone}\nДата: {post.date.strftime("%d.%m.%Y %H:%M")}\n\n{post.message}',
+					parse_mode='HTML'
 				)
 
 				await add_record(source, post.id)
@@ -69,7 +91,7 @@ async def parse_sources() -> None:
 			print('Парсер запущён...')
 
 			sources = await get_sources()
-
+			print(sources)
 			start = time.time()
 
 			for source in sources:

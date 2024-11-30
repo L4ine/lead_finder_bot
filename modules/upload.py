@@ -13,7 +13,7 @@ from data.config import APP_URL, TG_API_ID, TG_API_HASH, \
 router = APIRouter()
 
 
-@router.post(f"/{APP_URL}/upload/")
+@router.post(f"{APP_URL}/upload/")
 async def handle_form(
 	request: UploadFile = File(None),
 	save: str = Form(None),
@@ -26,7 +26,7 @@ async def handle_form(
 			with open(file_location, "wb+") as file_object:
 				file_object.write(request.file.read())
 
-		return RedirectResponse(f'/{APP_URL}/userbot', status_code=303)
+		return RedirectResponse(f'{APP_URL}/userbot', status_code=303)
 
 	if test:
 		try:
@@ -39,4 +39,4 @@ async def handle_form(
 		except Exception as exc:
 			logging.error(exc)
 
-		return RedirectResponse(f'/{APP_URL}/userbot', status_code=303)
+		return RedirectResponse(f'{APP_URL}/userbot', status_code=303)

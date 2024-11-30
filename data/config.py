@@ -29,3 +29,4 @@ APP_TITLE = getenv('APP_TITLE')
 
 ADMIN_LIST = getenv('ADMIN_LIST').split(',')
 WORDS_LIST_ID = getenv('WORDS_LIST_ID')
+STOP_WORDS_LIST_ID = getenv('STOP_WORDS_LIST_ID')
